@@ -1,0 +1,137 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int ROWS = 10;
+const int COLS = 10;
+const int MINES = 10;
+
+int board[ROWS][COLS];
+bool revealed[ROWS][COLS];
+
+void initBoard() {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            board[i][j] = 0;
+            revealed[i][j] = false;
+        }
+    }
+
+    int count = 0;
+    while (count < MINES) {
+        int row = rand() % ROWS;
+        int col = rand() % COLS;
+        if (board[row][col] != -1) {
+            board[row][col] = -1;
+            count++;
+        }
+    }
+
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            if (board[i][j] != -1) {
+                int count = 0;
+                if (i > 0 && j > 0 && board[i - 1][j - 1] == -1) count++;
+                if (i > 0 && board[i - 1][j] == -1) count++;
+                if (i > 0 && j < COLS - 1 && board[i - 1][j + 1] == -1) count++;
+                if (j > 0 && board[i][j - 1] == -1) count++;
+                if (j < COLS - 1 && board[i][j + 1] == -1) count++;
+                if (i < ROWS - 1 && j > 0 && board[i + 1][j - 1] == -1) count++;
+                if (i < ROWS - 1 && board[i + 1][j] == -1) count++;
+                if (i < ROWS - 1 && j < COLS - 1 && board[i + 1][j + 1] == -1) count++;
+                board[i][j] = count;
+            }
+        }
+    }
+}
+
+void printBoard() {
+    cout << "  ";
+    for (int j = 0; j < COLS; j++) {
+        cout << j << " ";
+    }
+    cout << endl;
+
+    for (int i = 0; i < ROWS; i++) {
+        cout << i << " ";
+        for (int j = 0; j < COLS; j++) {
+            if (revealed[i][j]) {
+                if (board[i][j] == -1) {
+                    cout << "* ";
+                } else {
+                    cout << board[i][j] << " ";
+                }
+            } else {
+                cout << ". ";
+            }
+        }
+        cout << endl;
+    }
+}
+
+bool isWin() {
+    int count = 0;
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            if (board[i][j] != -1 && revealed[i][j]) {
+                count++;
+            }
+        }
+    }
+    return count == ROWS * COLS - MINES;
+}
+
+bool isLose() {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            if (board[i][j] == -1 && revealed[i][j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void reveal(int row, int col) {
+    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
+        return;
+    }
+    if (revealed[row][col]) {
+        return;
+    }
+    revealed[row][col] = true;
+    if (board[row][col] == 0) {
+        reveal(row - 1, col - 1);
+        reveal(row - 1, col);
+        reveal(row - 1, col + 1);
+        reveal(row, col - 1);
+        reveal(row, col + 1);
+        reveal(row + 1, col - 1);
+        reveal(row + 1, col);
+        reveal(row + 1, col + 1);
+    }
+}
+
+int main() {
+    srand(time(NULL));
+    initBoard();
+    printBoard();
+
+    while (!isWin() && !isLose()) {
+        int row, col;
+        cout << "Enter row and column: ";
+        cin >> row >> col;
+        reveal(row, col);
+        printBoard();
+    }
+
+    if (isWin()) {
+        cout << "You win!" << endl;
+    } else {
+        cout << "You lose!" << endl;
+    }
+
+    return 0;
+}
