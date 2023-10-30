@@ -1,0 +1,35 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int ROWS = 9;
+const int COLS = 9;
+const int COLORS = 5;
+
+int board[ROWS][COLS];
+
+void initBoard() {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            board[i][j] = rand() % COLORS + 1;
+        }
+    }
+}
+
+void printBoard() {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            cout << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    srand(time(NULL));
+    initBoard();
+    printBoard();
+    return 0;
+}
